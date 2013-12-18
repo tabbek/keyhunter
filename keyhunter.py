@@ -14,7 +14,7 @@ if len(sys.argv)!=2:
 
 filename = sys.argv[1]
 
-f = open(filename)
+
 magic = '\x01\x30\x82\x01\x13\x02\x01\x01\x04\x20'
 magiclen = len(magic)
 
@@ -58,32 +58,33 @@ def EncodeBase58Check(secret):
 ########## end code from pywallet.py ############
 
 
+with open(filename, 'r') as f:
 
-# read through target file
-# one block at a time
-while True:
-  data = f.read(readlength)
-  if not data:
-    break
 
-  # look in this block for keys
-  x=0
+  # read through target file
+  # one block at a time
   while True:
-    # find the magic number
-    pos=data.find(magic,x)
-    #pos=data.find('\13\02\01\01\04\20',0)
-    if pos==-1:
+    data = f.read(readlength)
+    if not data:
       break
-    print EncodeBase58Check('\x80'+data[pos+magiclen:pos+magiclen+32])
-    x+=(pos+1)
-  
-  # are we at the end of the file?
-  if len(data) < readlength:
-    break
 
-  # make sure we didn't miss any keys at the end of the block
-  f.seek(f.tell()-(32+magiclen))
+    # look in this block for keys
+    x=0
+    while True:
+      # find the magic number
+      pos=data.find(magic,x)
+      #pos=data.find('\13\02\01\01\04\20',0)
+      if pos==-1:
+        break
+      print EncodeBase58Check('\x80'+data[pos+magiclen:pos+magiclen+32])
+      x+=(pos+1)
+  
+    # are we at the end of the file?
+    if len(data) < readlength:
+      break
+
+    # make sure we didn't miss any keys at the end of the block
+    f.seek(f.tell()-(32+magiclen))
 
 # code grabbed from pywallet.py
-
 
